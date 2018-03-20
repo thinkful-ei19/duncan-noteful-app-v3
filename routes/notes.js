@@ -1,18 +1,29 @@
 'use strict';
 
 const express = require('express');
+// const mongoose = require('mongoose');
 // Create an router instance (aka "mini-app")
+const Note = require('../models/note');
 const router = express.Router();
+
+
 
 /* ========== GET/READ ALL ITEM ========== */
 router.get('/notes', (req, res, next) => {
+  const searchTerm = req.query.searchTerm;
+  let filter = {};
 
-  console.log('Get All Notes');
-  res.json([
-    { id: 1, title: 'Temp 1' }, 
-    { id: 2, title: 'Temp 2' }, 
-    { id: 3, title: 'Temp 3' }
-  ]);
+  if (searchTerm) {
+    const re = new RegExp(searchTerm, 'i');
+    filter.title = { $regex: re };
+  }
+  return Note
+    .find(filter)
+    .sort('created')
+    .then(result => {
+      res.json(result);
+    })
+    .catch(next);
 
 });
 
