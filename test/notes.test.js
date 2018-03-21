@@ -44,6 +44,10 @@ describe('Tests for all CRUD endpoints', function(){
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('array');
+          res.body.forEach(function (item) {
+            expect(item).to.be.a('object');
+            expect(item).to.include.keys('id', 'title', 'content');
+          });
           expect(res.body).to.have.length(data.length);
         });
     });
@@ -150,7 +154,7 @@ describe('Tests for all CRUD endpoints', function(){
         });
     });
 
-    it.only('should send error when updating without title', function(){
+    it('should send error when updating without title', function(){
       const updateItem = {'foo' : 'bar'};
 
       let updateItemId;
@@ -172,6 +176,19 @@ describe('Tests for all CRUD endpoints', function(){
         .then(data => {
           expect(data.title).to.equal(originalNote.title);
           expect(data.content).to.equal(originalNote.content);
+        });
+    });
+
+  });
+  describe('DELETE /api/notes/:id', function(){
+    it('should delete an item from the database', function(){
+      return chai.request(app).delete('/api/notes/000000000000000000000000')
+        .then(res => {
+          expect(res).to.have.status(204);
+          return Note.findById('000000000000000000000000');
+        })
+        .then(data => {
+          expect(data).to.equal(null);
         });
     });
   });
