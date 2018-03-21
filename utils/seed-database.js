@@ -9,6 +9,7 @@ const seedNotes = require('../db/seed/notes');
 
 mongoose.connect(MONGODB_URI)
   .then(() => mongoose.connection.db.dropDatabase())
+//   .then(() => Note.createIndexes())
   .then(() => Note.insertMany(seedNotes))
   .then(results => {
     console.info(`Inserted ${results.length} Notes`);

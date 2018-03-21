@@ -3,14 +3,20 @@
 const mongoose = require('mongoose');
 
 const notesSchema = mongoose.Schema({
-  title : {type : String, required: true},
-  content : {type : String, required: true},
+  title : {type : String, required: true, index : true},
+  content : {type : String, required: true, index : true},
   created : {type: Date, default: Date.now }
 });
 
 
-// const Note = mongoose.model('Note', notesSchema);
+notesSchema.index({ title: 'text',  content: 'text'});
 
-// module.exports = {Note};
+notesSchema.set('toObject', {
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+  }
+});
 
 module.exports = mongoose.model('Note', notesSchema);

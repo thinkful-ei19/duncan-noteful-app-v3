@@ -10,16 +10,9 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEM ========== */
 router.get('/notes', (req, res, next) => {
-  const searchTerm = req.query.searchTerm;
-  let filter = {};
-
-  if (searchTerm) {
-    const re = new RegExp(searchTerm, 'i');
-    filter.title = { $regex: re };
-  }
-  return Note
-    .find(filter)
-    .sort('created')
+  const searchTerm = (req.query.searchTerm) ? { $text: { $search: req.query.searchTerm } } : {};
+  
+  return Note.find(searchTerm)
     .then(result => {
       res.json(result);
     })
