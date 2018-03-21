@@ -10,14 +10,26 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEM ========== */
 router.get('/notes', (req, res, next) => {
-  const searchTerm = (req.query.searchTerm) ? { $text: { $search: req.query.searchTerm } } : {};
-  
-  return Note.find(searchTerm)
-    .then(result => {
-      res.json(result);
-    })
-    .catch(next);
+  const { searchTerm } = req.query;
 
+  let filter = {};
+  let projection = {};
+  let sort = 'created'; // default sorting
+
+  if (searchTerm) {
+    filter.$text = { $search: searchTerm };
+    projection.score = { $meta: 'textScore' };
+    sort = projection;
+  }
+
+  Note.find(filter, projection)
+    .sort(sort)
+    .then(results => {
+      res.json(results);
+    })
+    .catch(err => {
+      next(err);
+    });
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
